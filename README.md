@@ -22,7 +22,7 @@ Change the paths if necessary. (It works by default if the makefiles are not cha
 
 # How to use #
 
-1. Build binaries
+1. Build the binaries of the tasks
 
 	```cd 11mopp```
 
