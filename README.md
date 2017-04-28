@@ -10,6 +10,12 @@ Robert Krahn
 
 Franz Gregor
 
+# How to develop #
+
+Look in the folder *11mopp* for the four sub folders resembling the four tasks.
+In the subfolders e.g. *game-of-life* you may change the source code and the makefile.
+The makefile always needs to create an executable binary!
+
 # How to use #
 
 1. Build binaries
@@ -33,3 +39,8 @@ Franz Gregor
 
 	```./cds-tool/bin/cds-tool run --measure --image [DOCKER ID] -c [NUMBER OF CPUs] --input [INPUT FOR THE TASK] [NAME OF TASK as is 11mopp/cds_server.json]```
 	```./cds-tool/bin/cds-tool run --measure --image 2e32ab3296ea -c 1 --input 11mopp/game-of-life/life.in 11mopp-game-of-life```
+
+4. Start a 'judge' with the docker container:
+
+	```./cds-tool/bin/cds-tool run --measure --image [DOCKER ID] -c [NUMBER OF CPUs] --input [JUDGE FOR THE TASK] [NAME OF TASK as is 11mopp/cds_server.json]```
+	```./cds-tool/bin/cds-tool run --measure --image 2e32ab3296ea -c 1 --input 11mopp/game-of-life/judge.in 11mopp-game-of-life```
