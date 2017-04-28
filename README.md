@@ -12,18 +12,20 @@ Franz Gregor
 
 # How to use #
 
-```cd 11mopp```
-```make```
+1. Build binaries
 
-To create the docker container:
+```cd 11mopp
+make```
+
+2. Create the docker container
 
 ```docker build .```
 
 Cearefully look for a line at the end that prints the container number:
-e.g. 
+
 
 ```Successfully built 2e32ab3296ea```
 
-To start a measurement with the docker container:
+3. Start a measurement with the docker container:
 
 ```./cds-tool/bin/cds-tool run --measure --image 2e32ab3296ea -c 1 --input 11mopp/game-of-life/life.in 11mopp-game-of-life```
