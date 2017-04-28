@@ -9,3 +9,21 @@ The tasks are taken from the **[Marathon of Parallel Programming 2016](https://b
 Robert Krahn
 
 Franz Gregor
+
+# How to use #
+
+```cd 11mopp```
+```make```
+
+To create the docker container:
+
+```docker build .```
+
+Cearefully look for a line at the end that prints the container number:
+e.g. 
+
+```Successfully built 2e32ab3296ea```
+
+To start a measurement with the docker container:
+
+```./cds-tool/bin/cds-tool run --measure --image 2e32ab3296ea -c 1 --input 11mopp/game-of-life/life.in 11mopp-game-of-life```
