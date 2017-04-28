@@ -14,11 +14,13 @@ Franz Gregor
 
 1. Build binaries
 
-	```cd 11mopp
+	```cd 11mopp```
 
-	make```
+	```make```
 
 2. Create the docker container
+
+	```cd ..``` (to where 'Dockerfile' is located)
 
 	```docker build .```
 
