@@ -14,18 +14,18 @@ Franz Gregor
 
 1. Build binaries
 
-```cd 11mopp
-make```
+	```cd 11mopp
+	make```
 
 2. Create the docker container
 
-```docker build .```
+	```docker build .```
 
-Cearefully look for a line at the end that prints the container number:
+	Cearefully look for a line at the end that prints the container number:
 
 
-```Successfully built 2e32ab3296ea```
+	```Successfully built 2e32ab3296ea```
 
 3. Start a measurement with the docker container:
 
-```./cds-tool/bin/cds-tool run --measure --image 2e32ab3296ea -c 1 --input 11mopp/game-of-life/life.in 11mopp-game-of-life```
+	```./cds-tool/bin/cds-tool run --measure --image 2e32ab3296ea -c 1 --input 11mopp/game-of-life/life.in 11mopp-game-of-life```
