@@ -19,7 +19,7 @@ The makefile always needs to create an executable binary!
 You must not change the *.in files!
 
 The file 11mopp/cds_server.json contains a lookup table for the paths to the binaries of the tasks.
-Change the paths if necessary. (By default it works)
+Change the paths if necessary. (It works by default if the makefiles are not changed.)
 
 # How to use #
 
