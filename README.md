@@ -14,7 +14,6 @@ Franz Gregor
 
 Look in the folder *11mopp* for the four sub folders resembling the four tasks.
 In the subfolders e.g. *game-of-life* you may change the source code and the makefile.
-The makefile always needs to create an executable binary!
 
 You must not change the *.in files!
 
