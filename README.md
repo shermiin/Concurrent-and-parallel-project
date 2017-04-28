@@ -15,6 +15,7 @@ Franz Gregor
 1. Build binaries
 
 	```cd 11mopp
+
 	make```
 
 2. Create the docker container
@@ -28,4 +29,5 @@ Franz Gregor
 
 3. Start a measurement with the docker container:
 
+	```./cds-tool/bin/cds-tool run --measure --image [DOCKER ID] -c [NUMBER OF CPUs] --input [INPUT FOR THE TASK] [NAME OF TASK as is 11mopp/cds_server.json]```
 	```./cds-tool/bin/cds-tool run --measure --image 2e32ab3296ea -c 1 --input 11mopp/game-of-life/life.in 11mopp-game-of-life```
