@@ -26,15 +26,98 @@ Change the paths if necessary. (It works by default if the makefiles are not cha
 
 # How to use #
 
-1. Build the binaries of the tasks
+* Develop your software your way.
+* Adapt the image building process such that
+  * a) runtime and build dependencies are available in the generated image and
+  * b) your software is build during image creation.
+  Have a look at `Dockerfile`, `install_deps.sh` and `build.sh` to understand how we did it in this
+  template. We recommend you a comparable separation as this eases development.
 
-	```cd 11mopp```
+  Make sure the cds server is started by default (see `CMD` line in `Dockerfile`). Otherwise,
+  automatic measuring will fail.
+* Update `11mopp/cds_server.json` to reflect the situation in your image.
+  It links program names to the executable's location INSIDE of the image.
+  This allows the server to invoke the correct program.
+  For example with an entry of `["11mopp-histogram", "/11mopp/histogram/histogram"], ...` the
+  server will invoke `/11mopp/histogram/histogram` when the client requests `11mopp-histogram`
+  to be executed.
 
-	```make```
+  If you move or rename this configuration file make sure your update is reflected in the server's
+  invocation command (`CMD` line in `Dockerfile`).
 
-2. Create the docker container
+## Development ##
 
-	```cd ..``` (to where 'Dockerfile' is located)
+During development you should also use the container environment.
+This might be cumbersome at first but will reduce the pain near the deadline.
+
+Start by creating an interactive container of the base image used in your `Dockerfile`, mount the
+cds repository where it would be copied to by the `Dockerfile` and expose port 8080 of the container.
+For our seqeuntial template repository this would be done like this (assuming we are currently
+in the repositories root directory):
+
+$ docker run -it --rm -v `pwd`:/cds-lab -p8080 ubuntu:16.04 /bin/bash
+
+The container starts and you have an interactive bash session on the inside. Please note the `--rm`
+argument which instructs the Docker engine to remove the container once its stopped. Make sure your
+code changes are not removed with the container ;).
+
+Now, you can manually execute the two setup steps of the `Dockerfile` inside your interactive container:
+Install your dependencies:
+   $ /cds-lab/install_deps.sh
+and build your software:
+   $ pushd cds-lab && ./build.sh && popd
+
+With this done you can start the CDS server:
+
+$ /cds-lab/cds-tool/bin/cds-tool server -c cds-lab/cds-tool/cds_server.json
+
+The CDS server is waiting for requests now. So you can switch to a console on your host and invoke
+the CDS measurement tool:
+
+1. Find the container's name or id with docker ps:
+   $ docker ps 
+   CONTAINER ID        IMAGE               COMMAND             CREATED              STATUS              PORTS                     NAMES
+   3979aea71b8e        ubuntu:16.04        "/bin/bash"         About a minute ago   Up About a minute   0.0.0.0:32778->8080/tcp   tender_stonebraker
+
+2. Invoke the tool normally:
+   ./cds-tool/bin/cds-tool run --container tender_stonebraker --cpus 2 -i ./11mopp/sudokount/sudokount1.in 11mopp-sudokount
+   ran program 11mopp-sudokount
+   exit status: 0
+   duration: 643 micro seconds
+   stdout:
+   --------------
+   1
+   --------------
+   stderr:
+   --------------
+   --------------
+
+Now you can alter your code, stop the server, invoke the build script, restart the server and retry.
+You can omit the hassle of stopping and restarting the server if you get yourself another bash
+session in the container:
+
+$ docker exec -it $CONTAINER_ID_OR_NAME /bin/bash
+
+This creates another bash session inside of the container which you can use to reinvoke the build script.
+
+One last hint: If you encounter issues with the way your program is run there are two options:
+1. Activate debug or even trace output of the CDS server and client to see in more detail what is going on:
+
+   RUST_LOG=trace ./cds-tool/bin/cds-tool run --container tender_stonebraker --cpus 2 -i ./11mopp/sudokount/sudokount1.in 11mopp-sudokount
+   RUST_LOG=debug /cds-lab/cds-tool/bin/cds-tool server -c cds-lab/cds-tool/cds_server.json
+
+   This will help you understand what these tools do in more detail.
+
+2. Obviously, you can run your program without the CDS server and client allowing you to verify the
+   correct function of your program. Running sudokount inside of the container:
+   $ /cds-lab/11mopp/sudokount/sudokount < /cds-lab/11mopp/sudokount/sudokount2.in 
+     300064
+
+## Measurement-Mode ##
+
+In this mode the program is executed a number of times with different amounts of cpu cores.
+
+1. Create the docker container
 
 	```docker build .```
 
@@ -43,7 +126,7 @@ Change the paths if necessary. (It works by default if the makefiles are not cha
 
 	```Successfully built 2e32ab3296ea```
 
-3. Start a measurement with the docker container:
+2. Start a measurement with the docker container:
 
 	```./cds-tool/bin/cds-tool run --measure --image [DOCKER ID] -c [NUMBER OF CPUs] --input [INPUT FOR THE TASK] [NAME OF TASK as is 11mopp/cds_server.json]```
 	```./cds-tool/bin/cds-tool run --measure --image 2e32ab3296ea -c 1 --input 11mopp/game-of-life/life.in 11mopp-game-of-life```
