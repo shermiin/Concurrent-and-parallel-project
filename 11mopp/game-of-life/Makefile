@@ -8,4 +8,4 @@ life: life.c
 	$(CC) $(FLAGS) life.c -o life
 
 clean:
-	rm life
+	rm -f life

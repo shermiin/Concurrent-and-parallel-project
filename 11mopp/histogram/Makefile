@@ -8,4 +8,4 @@ histogram: histogram.c
 	$(CC) histogram.c $(FLAGS)  -o histogram
 
 clean:
-	rm histogram
+	rm -f histogram
