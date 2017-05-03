@@ -1,43 +1,48 @@
 # Foundations of Concurrent and Distributed Systems Lab: Summer semester 2017 #
 
-This repository contains programming tasks, with their descriptions, sequential C sources, and test inputs.
-The tasks are taken from the **[Marathon of Parallel Programming 2016](https://bitbucket.org/r0bcrane/fcds-lab-2017/src/b1a657cd5eacfcf7d6ede9a664c25d59989b7c99/Marathon%20of%20Parallel%20Programming%20problemset.pdf?at=master)**
+This repository contains programming tasks, with their descriptions, sequential C/C++ sources, test inputs and outputs as well as the testing infrastructure for the 2017 CDS Lab.
+The tasks are taken from the [Marathon of Parallel Programming 2016](https://bitbucket.org/r0bcrane/fcds-lab-2017/src/b1a657cd5eacfcf7d6ede9a664c25d59989b7c99/Marathon%20of%20Parallel%20Programming%20problemset.pdf?at=master).
+Find further information at the [Lab's website](https://tu-dresden.de/ing/informatik/sya/se/studium/labs-seminars/concurrent_and_distributed_systems_lab/summer-semester-2017/index).
+
+Please use this repository as a template for your work.
+We will a procedure similar to the one described in the next section to evaluate your solution's performance.
+So, *make sure what is described here works for your repository prior submission*.
 
 # How to get started #
 
-These steps build the docker container and run concurrency tests.
-In this mode the program is executed a number of times with different amounts of cpu cores.
+These steps, build the docker container and run concurrency tests.
+In this mode the program is executed a number of times with different amounts of CPUs cores.
 
-1. Create the docker container
+1. Clone the repository and switch your working directory to it:
 
-	```$ docker build .```
+        $ git clone git@bitbucket.org:r0bcrane/fcds-lab-2017.git && cd fcds-lab-2017
 
-	Cearefully look for a line at the end that prints the container number:
+2. Create the Docker image:
 
-	```Successfully built 2e32ab3296ea```
+        $ docker build .
 
-2. Start a measurement with the docker container:
+	Carefully look for a line at the end that prints the image's id:
 
-	```$ ./cds-tool/bin/cds-tool run --measure --image [DOCKER ID] -c [NUMBER OF CPUs] --input [INPUT FOR THE TASK] [NAME OF TASK as is 11mopp/cds_server.json]```
-	```$ ./cds-tool/bin/cds-tool run --measure --image 2e32ab3296ea -c 1,2,3,4 --input 11mopp/game-of-life/life.in 11mopp-game-of-life```
+        Successfully built 2e32ab3296ea
 
-3. Start a 'judge' with the docker container:
+	You can also use the `-t` option to name the image and use the given name afterwards with the `cds-tool`.
 
-    ```$ ./cds-tool/bin/cds-tool run --measure --image [DOCKER ID] -c [NUMBER OF CPUs] --input [JUDGE FOR THE TASK] [NAME OF TASK as is 11mopp/cds_server.json]```
-    ```$ ./cds-tool/bin/cds-tool run --measure --image 2e32ab3296ea -c 1,2,3,4 --input 11mopp/game-of-life/judge.in 11mopp-game-of-life```
+3. Run a measurement with the created Docker image:
 
+        $ ./cds-tool/bin/cds-tool run --measure --image [IMAGE ID] -c [NUMBER OF CPUs] --input [INPUT FOR THE TASK] [NAME OF TASK as is 11mopp/cds_server.json]
+        $ ./cds-tool/bin/cds-tool run --measure --image 2e32ab3296ea -c 1,2,3,4 --input 11mopp/game-of-life/judge.in 11mopp-game-of-life
 
-The difference between using judge.in and e.g. life.in is simply the extend of tests executed. Judge.in uses a larger input.
+# About this Repository #
 
-# How to develop #
+The `11mopp` directory contains four sub directories resembling seqeuntial solutions of the four marathon tasks.
+Everything is build via Makefiles. There is a global Makefile in `11mopp` and task specific ones in their respective sub directories.
+The global Makefile is invoked in `build.sh` which gets called during the Docker image creation (see `Dockerfile`).
 
-Look in the folder *11mopp* for the four sub folders resembling the four tasks.
-In the subfolders e.g. *game-of-life* you may change the source code and the makefile.
+In `cds-tool` you'll find the source code of the program that 1) creates the server inside of the running Docker container and invokes your programs and 2) queries this server and starts the docker container if necessary.
+A precompiled binary can be found at `cds-tool/bin/cds-tool`. You can recompile the tool with `build_cds-tool.sh`. This script will install [Rust](https://www.rust-lang.org/) on your machine if it's not already installed. (You can run it in an container if you don't want Rust to be installed on your machine ;) )
 
-You must not change the *.in files!
-
-The file `11mopp/cds_server.json` contains a lookup table for the paths to the binaries of the tasks.
-Change the paths if necessary. (It works by default if the makefiles are not changed.)
+The file `11mopp/cds_server.json` contains a lookup table for the paths to the binaries of the tasks used by the server.
+Change the paths if your setup puts the binaries to other locations (which is likely).
 Update `11mopp/cds_server.json` to reflect the situation in your image.
 It links program names to the executable's location INSIDE of the image.
 This allows the server to invoke the correct program.
