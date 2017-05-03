@@ -10,7 +10,7 @@ In this mode the program is executed a number of times with different amounts of
 
 1. Create the docker container
 
-	```docker build .```
+	```$ docker build .```
 
 	Cearefully look for a line at the end that prints the container number:
 
@@ -18,13 +18,14 @@ In this mode the program is executed a number of times with different amounts of
 
 2. Start a measurement with the docker container:
 
-	```./cds-tool/bin/cds-tool run --measure --image [DOCKER ID] -c [NUMBER OF CPUs] --input [INPUT FOR THE TASK] [NAME OF TASK as is 11mopp/cds_server.json]```
-	```./cds-tool/bin/cds-tool run --measure --image 2e32ab3296ea -c 1,2,3,4 --input 11mopp/game-of-life/life.in 11mopp-game-of-life```
+	```$ ./cds-tool/bin/cds-tool run --measure --image [DOCKER ID] -c [NUMBER OF CPUs] --input [INPUT FOR THE TASK] [NAME OF TASK as is 11mopp/cds_server.json]```
+	```$ ./cds-tool/bin/cds-tool run --measure --image 2e32ab3296ea -c 1,2,3,4 --input 11mopp/game-of-life/life.in 11mopp-game-of-life```
 
 3. Start a 'judge' with the docker container:
 
-	```./cds-tool/bin/cds-tool run --measure --image [DOCKER ID] -c [NUMBER OF CPUs] --input [JUDGE FOR THE TASK] [NAME OF TASK as is 11mopp/cds_server.json]```
-	```./cds-tool/bin/cds-tool run --measure --image 2e32ab3296ea -c 1,2,3,4 --input 11mopp/game-of-life/judge.in 11mopp-game-of-life```
+    ```$ ./cds-tool/bin/cds-tool run --measure --image [DOCKER ID] -c [NUMBER OF CPUs] --input [JUDGE FOR THE TASK] [NAME OF TASK as is 11mopp/cds_server.json]```
+    ```$ ./cds-tool/bin/cds-tool run --measure --image 2e32ab3296ea -c 1,2,3,4 --input 11mopp/game-of-life/judge.in 11mopp-game-of-life```
+
 
 The difference between using judge.in and e.g. life.in is simply the extend of tests executed. Judge.in uses a larger input.
 
@@ -71,7 +72,13 @@ cds repository where it would be copied to by the `Dockerfile` and expose port 8
 For our seqeuntial template repository this would be done like this (assuming we are currently
 in the repositories root directory):
 
+
+```
+#!bash
+
 $ docker run -it --rm -v `pwd`:/cds-lab -p8080 ubuntu:16.04 /bin/bash
+```
+
 
 The container starts and you have an interactive bash session on the inside. Please note the `--rm`
 argument which instructs the Docker engine to remove the container once its stopped. Make sure your
@@ -79,23 +86,45 @@ code changes are not removed with the container ;).
 
 Now, you can manually execute the two setup steps of the `Dockerfile` inside your interactive container:
 Install your dependencies:
-   $ /cds-lab/install_deps.sh
+
+```
+#!bash
+
+$ /cds-lab/install_deps.sh
+```
+
 and build your software:
-   $ pushd cds-lab && ./build.sh && popd
+
+```
+#!bash
+
+$ pushd cds-lab && ./build.sh && popd
+```
+
 
 With this done you can start the CDS server:
 
-$ /cds-lab/cds-tool/bin/cds-tool server -c cds-lab/cds-tool/cds_server.json
+```$ /cds-lab/cds-tool/bin/cds-tool server -c cds-lab/cds-tool/cds_server.json```
 
 The CDS server is waiting for requests now. So you can switch to a console on your host and invoke
 the CDS measurement tool:
 
-1. Find the container's name or id with docker ps:
+* Find the container's name or id with docker ps:
+
+```
+#!bash
+
    $ docker ps 
    CONTAINER ID        IMAGE               COMMAND             CREATED              STATUS              PORTS                     NAMES
    3979aea71b8e        ubuntu:16.04        "/bin/bash"         About a minute ago   Up About a minute   0.0.0.0:32778->8080/tcp   tender_stonebraker
+```
 
-2. Invoke the tool normally:
+
+* Invoke the tool normally:
+
+```
+#!bash
+
    ./cds-tool/bin/cds-tool run --container tender_stonebraker --cpus 2 -i ./11mopp/sudokount/sudokount1.in 11mopp-sudokount
    ran program 11mopp-sudokount
    exit status: 0
@@ -107,25 +136,36 @@ the CDS measurement tool:
    stderr:
    --------------
    --------------
+```
+
 
 Now you can alter your code, stop the server, invoke the build script, restart the server and retry.
 You can omit the hassle of stopping and restarting the server if you get yourself another bash
 session in the container:
 
-$ docker exec -it $CONTAINER_ID_OR_NAME /bin/bash
+```$ docker exec -it $CONTAINER_ID_OR_NAME /bin/bash```
 
 This creates another bash session inside of the container which you can use to reinvoke the build script.
 
 One last hint: If you encounter issues with the way your program is run there are two options:
-1. Activate debug or even trace output of the CDS server and client to see in more detail what is going on:
+* Activate debug or even trace output of the CDS server and client to see in more detail what is going on:
 
-   RUST_LOG=trace ./cds-tool/bin/cds-tool run --container tender_stonebraker --cpus 2 -i ./11mopp/sudokount/sudokount1.in 11mopp-sudokount
-   RUST_LOG=debug /cds-lab/cds-tool/bin/cds-tool server -c cds-lab/cds-tool/cds_server.json
+```
+#!bash
+
+$ RUST_LOG=trace ./cds-tool/bin/cds-tool run --container tender_stonebraker --cpus 2 -i ./11mopp/sudokount/sudokount1.in 11mopp-sudokount
+$ RUST_LOG=debug /cds-lab/cds-tool/bin/cds-tool server -c cds-lab/cds-tool/cds_server.json
+```
+
 
    This will help you understand what these tools do in more detail.
 
-2. Obviously, you can run your program without the CDS server and client allowing you to verify the
+* Obviously, you can run your program without the CDS server and client allowing you to verify the
    correct function of your program. Running sudokount inside of the container:
-   $ /cds-lab/11mopp/sudokount/sudokount < /cds-lab/11mopp/sudokount/sudokount2.in 
-     300064
+   
+```
+#!bash
 
+$ /cds-lab/11mopp/sudokount/sudokount < /cds-lab/11mopp/sudokount/sudokount2.in 
+     300064
+```
