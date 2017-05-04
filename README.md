@@ -34,8 +34,8 @@ In this mode the program is executed a number of times with different amounts of
 
 # About this Repository #
 
-The `11mopp` directory contains four sub directories resembling seqeuntial solutions of the four marathon tasks.
-Everything is build via Makefiles. There is a global Makefile in `11mopp` and task specific ones in their respective sub directories.
+The `11mopp` directory contains four sub directories resembling sequential solutions of the four marathon tasks.
+Everything is built via Makefiles. There is a global Makefile in `11mopp` and task-specific ones in their respective sub directories.
 The global Makefile is invoked in `build.sh` which gets called during the Docker image creation (see `Dockerfile`).
 
 In `cds-tool` you'll find the source code of the program that 1) creates the server inside of the running Docker container and invokes your programs and 2) queries this server and starts the docker container if necessary.
@@ -49,7 +49,8 @@ This allows the server to invoke the correct program.
 For example with an entry of `["11mopp-histogram", "/11mopp/histogram/histogram"], ...` the
 server will invoke `/11mopp/histogram/histogram` when the client requests `11mopp-histogram`
 to be executed.
-The following programs have to be listed:
+The four tasks have to be named as follows for our script to invoke the correct program:
+
 * 11mopp-string-parsing
 * 11mopp-game-of-life
 * 11mopp-sudokount
@@ -57,10 +58,10 @@ The following programs have to be listed:
 
 # General Advice #
 
-* Develop your software your way.
+* Develop your software your way. Use tools, languages and libraries as you wish.
 * Adapt the image building process such that
-  * a) runtime and build dependencies are available in the generated image and
-  * b) your software is build during image creation.
+  a) runtime and build dependencies are available in the generated image and
+  b) your software is built during image creation.
   Have a look at `Dockerfile`, `install_deps.sh` and `build.sh` to understand how we did it in this
   template. We recommend you a comparable separation as this eases development.
 
@@ -153,6 +154,7 @@ session in the container:
 This creates another bash session inside of the container which you can use to reinvoke the build script.
 
 One last hint: If you encounter issues with the way your program is run there are two options:
+
 * Activate debug or even trace output of the CDS server and client to see in more detail what is going on:
 
 ```
