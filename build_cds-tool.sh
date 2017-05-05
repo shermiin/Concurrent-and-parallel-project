@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 # build the cds-tool installing rust if necessary
 
 type cargo >/dev/null 2>&1 || {

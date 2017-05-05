@@ -78,12 +78,12 @@ fn run() -> Result<()> {
             .arg_from_usage("--image=[image] 'Docker image to use'")
             .arg_from_usage("--container=[container] 'Docker container to use'")
             //.arg_from_usage("-p --port 'Private port the CDS server is listining on'")
-            .arg_from_usage("-i --input=<input> 'File containing the problem'")
+            .arg_from_usage("-i --input=<input> 'File containing the problem (required)'")
             .arg_from_usage("-o --output=[output] 'File containing the expected output/solution'")
             .arg_from_usage("-w --write=[write] 'Write output to this file'")
-            .arg_from_usage("-m --measure 'Measure-mode, run multiple times and output csv-like data'")
-            .arg_from_usage("-c --cpus=[cpus] 'Number of cpus the application is allowed to use'")
-            .arg_from_usage("-r --runs=[runs] 'Number of runs to average the program runtime (only in measure-mode)'")
+            .arg_from_usage("-m --measure 'Measure-mode, run multiple times and output csv-like data (duration in micro seconds)'")
+            .arg_from_usage("-c --cpus=[cpus] 'Number of cpus the application is allowed to use (can be a comma-separated list in measure-mode) [default: 1,2,3,4]'")
+            .arg_from_usage("-r --runs=[runs] 'Number of runs to average the program runtime (only in measure-mode) [default: 3]'")
             .arg_from_usage("<program> 'The program to start'")
             .group(clap::ArgGroup::with_name("unit-under-test")
                 .args(&["image", "container"])
@@ -139,9 +139,14 @@ fn run() -> Result<()> {
                 println!("program; run; cpus; duration;");
 
                 for r in 0..try!(sub_m.value_of("runs").unwrap_or("3").parse().chain_err(|| "Given runs is not a number")) {
-                    for c in sub_m.value_of("cpus").unwrap_or("1,2,4,8").split(",") {
-                        let cpuset = (0..try!(c.parse::<u32>().chain_err(|| "Given cpu count is not a positive number"))).map(|x| format!("{}", x)).collect::<Vec<String>>().join(",");
-                        let cid = try!(docker::start_container(image_id, &["--cpuset-cpus", cpuset.as_str(), "-p", port.to_string().as_str()])
+                    for cpus in sub_m.value_of("cpus").unwrap_or("1,2,4,8").split(",") {
+                        let cpus = try!(cpus.parse::<u32>().chain_err(|| "Given cpu count is not a positive number"));
+                        let cpuset = (0..cpus).map(|x| format!("{}", x)).collect::<Vec<String>>().join(",");
+                        let cid = try!(docker::start_container(image_id,
+                                                               &["--cpuset-cpus", cpuset.as_str(),
+                                                                 "-p", port.to_string().as_str(),
+                                                                 "-e", format!("MAX_CPUS={}", cpus).as_str()
+                                                                ])
                             .chain_err(|| "starting of measurement container failed"));
                         finally! {{
                             docker::stop_container(cid.as_str(), true);
@@ -166,7 +171,7 @@ fn run() -> Result<()> {
                             try!(write_to.write_all(stdout.as_bytes()).chain_err(|| "unable to write to output file"));
                         }
 
-                        println!("{}; {}; {}; {}", program, r, c, duration);
+                        println!("{}; {}; {}; {}", program, r, cpus, duration);
                     }
                 }
             } else {
@@ -175,10 +180,14 @@ fn run() -> Result<()> {
                     if cpus.find(",").is_some() {
                         bail!("multiple, comma separated --cpus argument are only allowed in measurement-mode");
                     }
-                    let cpuset = (0..try!(cpus.parse::<u32>().chain_err(|| "Given cpu count is not a positive number"))).map(|x| format!("{}", x)).collect::<Vec<String>>().join(",");
-
-                    let cid = try!(docker::start_container(image_id, &["--cpuset-cpus", cpuset.as_str(), "-p", port.to_string().as_str()])
-                            .chain_err(|| "starting of measurement container failed"));
+                    let cpus = try!(cpus.parse::<u32>().chain_err(|| "Given cpu count is not a positive number"));
+                    let cpuset = (0..cpus).map(|x| format!("{}", x)).collect::<Vec<String>>().join(",");
+                    let cid = try!(docker::start_container(image_id,
+                                                           &["--cpuset-cpus", cpuset.as_str(),
+                                                             "-p", port.to_string().as_str(),
+                                                             "-e", format!("MAX_CPUS={}", cpus).as_str()
+                                                            ])
+                        .chain_err(|| "starting of measurement container failed"));
                     (cid, true)
                 } else {
                     (sub_m.value_of("container").unwrap().to_string(), false)
