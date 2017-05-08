@@ -13,7 +13,7 @@ So, *make sure what is described here works for your repository prior submission
 These steps, build the docker container and run concurrency tests.
 In this mode the program is executed a number of times with different amounts of CPUs cores.
 
-1. Fork this repository to your account.
+1. Fork this repository to your account. (Look for 'Fork this repository' in the bitbucket menu.) 
 
 1. Clone your repository and switch your working directory to it:
 
