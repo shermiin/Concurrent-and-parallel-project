@@ -13,9 +13,11 @@ So, *make sure what is described here works for your repository prior submission
 These steps, build the docker container and run concurrency tests.
 In this mode the program is executed a number of times with different amounts of CPUs cores.
 
-1. Clone the repository and switch your working directory to it:
+1. Fork this repository to your account.
 
-        $ git clone git@bitbucket.org:r0bcrane/fcds-lab-2017.git && cd fcds-lab-2017
+1. Clone your repository and switch your working directory to it:
+
+        $ git clone git@bitbucket.org:[YOUR_USERNAME]/fcds-lab-2017.git && cd fcds-lab-2017
 
 2. Create the Docker image:
 
