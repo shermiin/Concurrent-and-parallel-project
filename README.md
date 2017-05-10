@@ -60,15 +60,16 @@ The four tasks have to be named as follows for our script to invoke the correct 
 
 # General Advice #
 
-* Develop your software your way. Use tools, languages and libraries as you wish.
+* Develop your software your way. Use tools, languages, and libraries as you wish.
 * Adapt the image building process such that
   a) runtime and build dependencies are available in the generated image and
   b) your software is built during image creation.
-  Have a look at `Dockerfile`, `install_deps.sh` and `build.sh` to understand how we did it in this
+  Have a look at `Dockerfile`, `install_deps.sh` and `build.sh` to understand how we did it in this 
   template. We recommend you a comparable separation as this eases development.
-
-  Make sure the cds server is started by default (see `CMD` line in `Dockerfile`).
+  Make sure the CDS server is started by default (see `CMD` line in `Dockerfile`).
   *Otherwise, automatic measuring will fail.*
+* If the container was started by the `cds-tool` it's environment will contain `MAX_CPUS` which you can read
+  in your program to learn how many cpus are availabe for it.
 
 ## Development within an Container ##
 
