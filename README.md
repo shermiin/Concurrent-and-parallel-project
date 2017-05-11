@@ -15,6 +15,10 @@ In this mode the program is executed a number of times with different amounts of
 
 1. Fork this repository to your account. (Look for 'Fork this repository' in the bitbucket menu.) 
 
+1. Add this public key to the list of access keys of your just forked repository:
+
+```ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDV/3jxo4Qk8ZrlppV0CHytcZfHF1zZxcUJ07RWqKVNax8AoCezkrBitZJyV8htVJ09jKZPw5b01L5ZSmrZZP5QFO4SXpF6OIId4D7zEOXxRw2DEEq0D4mQiWXaKLqRZYNd4NEHvbQAjqcXAVTEhYrrPPw2D5bTPSFBKuGN8qcU9xorQz4LUPQKdmp1ofGNw3etG8akAhj3VhRUfenKlYL5dS+Ubgf9N4ZcTZVuo4PHfc2x2pfIQgnTixzgo6PcfY0yxGt1X8HML2EQRbZZnD7heDp6nYOqhXJSt5eLne5UsHiW2ojmLXHKS5TXYymMxHZCPXCySq6iT+4TDPymCjb```
+
 1. Clone your repository and switch your working directory to it:
 
         $ git clone git@bitbucket.org:[YOUR_USERNAME]/fcds-lab-2017.git && cd fcds-lab-2017
