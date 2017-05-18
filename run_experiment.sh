@@ -1,4 +1,4 @@
-
+#!/bin/bash
 cd $HOME
 
 # Stop and remove old container
@@ -33,7 +33,7 @@ if [ ! -z "$CONTAINER" ]; then
 fi
 
 
-IMAGE=$(ssh $TARGET 'docker images' | grep '$USERNAME' | awk '{ print $3 }' | tr '\n' ' ')
+IMAGE=$(docker images | grep '$USERNAME' | awk '{ print $3 }' | tr '\n' ' ')
 if [ ! -z "$IMAGE" ]; then
 	 docker rmi $IMAGE
 fi
