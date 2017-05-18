@@ -11,7 +11,6 @@ use self::rustc_serialize::json::Json;
 
 use serde_json;
 
-use std;
 use std::thread;
 use std::fs::File;
 use std::path::Path;
@@ -21,8 +20,6 @@ use std::process::{Command, Stdio};
 
 use std::io::{Write, Read};
 use std::ops::DerefMut;
-use std::ops::Add;
-use std::os::unix::io::IntoRawFd;
 
 use errors::*;
 
