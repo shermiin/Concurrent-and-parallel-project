@@ -26,8 +26,10 @@ if [ ! -z "$IMAGE" ]; then
     # replace cds-tool in student image
     CONTAINER=$(docker run -v $(pwd)/cds-root/cds-tool/bin/:/mnt -d $USERNAME bash -c 'eval "cp /mnt/cds-tool `which cds-tool`"')
     docker wait ${CONTAINER}
-    IMAGE=`docker commit ${CONTAINER} ${USERNAME}:latest`
+    # delete original image
     docker rmi ${IMAGE}
+    # put modified image instead
+    IMAGE=`docker commit ${CONTAINER} ${USERNAME}:latest`
     docker rm ${CONTAINER}
 fi
 
