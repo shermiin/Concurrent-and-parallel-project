@@ -39,7 +39,7 @@ if [ ! -z "$IMAGE" ]; then
     # remove the container
     docker rm ${CONTAINER}
     # and the original image
-    docker rmi ${ORIG_IMAGE}
+    #docker rmi ${ORIG_IMAGE}
     set +e
 
     # run experiments
