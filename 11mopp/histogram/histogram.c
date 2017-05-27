@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+ #include <omp.h>
 
 #define RGB_COMPONENT_COLOR 255
 
@@ -87,11 +88,22 @@ void Histogram(PPMImage *image, float *h) {
 	cols = image->x;
 	rows = image->y;
 
+
+
+#pragma omp parallel for private(i)
+
 	for (i = 0; i < n; i++) {
 		image->data[i].red = floor((image->data[i].red * 4) / 256);
 		image->data[i].blue = floor((image->data[i].blue * 4) / 256);
 		image->data[i].green = floor((image->data[i].green * 4) / 256);
 	}
+
+
+
+
+
+
+
 
 	count = 0;
 	x = 0;
@@ -109,7 +121,15 @@ void Histogram(PPMImage *image, float *h) {
 			}
 		}
 	}
+
+
+
+
+
 }
+
+
+
 
 int main(int argc, char *argv[]) {
 
@@ -119,13 +139,24 @@ int main(int argc, char *argv[]) {
 
 	float *h = (float*)malloc(sizeof(float) * 64);
 
+
+
+
+
 	for(i=0; i < 64; i++) h[i] = 0.0;
 
 	Histogram(image, h);
 
+
+
+
+
+
 	for (i = 0; i < 64; i++){
 		printf("%0.3f ", h[i]);
 	}
+
+
 	printf("\n");
 	free(h);
 
