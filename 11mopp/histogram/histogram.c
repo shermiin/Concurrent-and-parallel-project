@@ -102,18 +102,25 @@ void Histogram(PPMImage *image, float *h) {
 
 
 
-
+#pragma omp parallel for
 
 
 	count = 0;
 	x = 0;
+         #pragma omp for
 	for (j = 0; j <= 3; j++) {
+                 
 		for (k = 0; k <= 3; k++) {
+                  
 			for (l = 0; l <= 3; l++) {
+                            
+
 				for (i = 0; i < n; i++) {
 					if (image->data[i].red == j && image->data[i].green == k && image->data[i].blue == l) {
 						count++;
 					}
+
+                                     
 				}
 				h[x] = count / n;
 				count = 0;
@@ -131,6 +138,8 @@ void Histogram(PPMImage *image, float *h) {
 
 
 
+
+
 int main(int argc, char *argv[]) {
 
 	int i;
@@ -140,7 +149,7 @@ int main(int argc, char *argv[]) {
 	float *h = (float*)malloc(sizeof(float) * 64);
 
 
-
+#pragma omp parallel for
 
 
 	for(i=0; i < 64; i++) h[i] = 0.0;
@@ -149,8 +158,7 @@ int main(int argc, char *argv[]) {
 
 
 
-
-
+#pragma omp parallel for
 
 	for (i = 0; i < 64; i++){
 		printf("%0.3f ", h[i]);
