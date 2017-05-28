@@ -90,7 +90,7 @@ void Histogram(PPMImage *image, float *h) {
 
 
 
-#pragma omp parallel for private(i)
+
 
 	for (i = 0; i < n; i++) {
 		image->data[i].red = floor((image->data[i].red * 4) / 256);
@@ -102,19 +102,23 @@ void Histogram(PPMImage *image, float *h) {
 
 
 
+
 #pragma omp parallel for
 
 
 	count = 0;
 	x = 0;
-         #pragma omp for
+   #pragma omp for private (j,k,l,i)
 	for (j = 0; j <= 3; j++) {
+
                  
 		for (k = 0; k <= 3; k++) {
+
                   
 			for (l = 0; l <= 3; l++) {
-                            
 
+                            
+                                
 				for (i = 0; i < n; i++) {
 					if (image->data[i].red == j && image->data[i].green == k && image->data[i].blue == l) {
 						count++;
@@ -157,10 +161,10 @@ int main(int argc, char *argv[]) {
 	Histogram(image, h);
 
 
-
 #pragma omp parallel for
 
 	for (i = 0; i < 64; i++){
+
 		printf("%0.3f ", h[i]);
 	}
 
