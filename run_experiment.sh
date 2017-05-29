@@ -43,8 +43,8 @@ if [ ! -z "$IMAGE" ]; then
 
     cd /data/cdslab/$USERNAME
     # check results
-    ./cds-root/cds-tool/bin/cds-tool run --image $USERNAME -c 8 --input ./cds-root/11mopp/string-parsing/spec.in -o ./cds-root/11mopp/string-parsing/spec.out
-    ./cds-root/cds-tool/bin/cds-tool run --image $USERNAME -c 8 --input ./cds-root/11mopp/string-parsing/spec_invalid.in -o ./cds-root/11mopp/string-parsing/spec_invalid.out
+    ./cds-root/cds-tool/bin/cds-tool run --image $USERNAME -c 8 --input ./cds-root/11mopp/string-parsing/spec.in -o ./cds-root/11mopp/string-parsing/spec.out 11mopp-string-parsing 
+    ./cds-root/cds-tool/bin/cds-tool run --image $USERNAME -c 8 --input ./cds-root/11mopp/string-parsing/spec_invalid.in -o ./cds-root/11mopp/string-parsing/spec_invalid.out 11mopp-string-parsing 
     ./cds-root/cds-tool/bin/cds-tool run --image $USERNAME -c 8 --input ./cds-root/11mopp/sudokount/sudokount1.in -o ./cds-root/11mopp/sudokount/sudokount1.out 11mopp-sudokount
     ./cds-root/cds-tool/bin/cds-tool run --image $USERNAME -c 8 --input ./cds-root/11mopp/sudokount/sudokount2.in -o ./cds-root/11mopp/sudokount/sudokount2.out 11mopp-sudokount
     ./cds-root/cds-tool/bin/cds-tool run --image $USERNAME -c 8 --input ./cds-root/11mopp/histogram/histogram.in -o ./cds-root/11mopp/histogram/histogram.out 11mopp-histogram 
