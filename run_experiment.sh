@@ -54,8 +54,8 @@ if [ ! -z "$IMAGE" ]; then
     # run experiments
     ./cds-root/cds-tool/bin/cds-tool run --measure --image $USERNAME -c 1,2,4,8 --input ./cds-root/11mopp/string-parsing/judge.in -o ./cds-root/11mopp/string-parsing/judge.out 11mopp-string-parsing | tee sp.$BUILD_TAG.log
     ./cds-root/cds-tool/bin/cds-tool run --measure --image $USERNAME -c 1,2,4,8 --input ./cds-root/11mopp/sudokount/judge.in -o ./cds-root/11mopp/sudokount/judge.out 11mopp-sudokount | tee sd.$BUILD_TAG.log
-    wget https://wwwpub.zih.tu-dresden.de/~krahn/world.ppm
-    ./cds-root/cds-tool/bin/cds-tool run --measure --image $USERNAME -c 1,2,4,8 --input ./cds-root/11mopp/histogram/world.ppm 11mopp-histogram | tee hg.$BUILD_TAG.log
+    wget -q https://wwwpub.zih.tu-dresden.de/~krahn/world.ppm
+    ./cds-root/cds-tool/bin/cds-tool run --measure --image $USERNAME -c 1,2,4,8 --input ./world.ppm 11mopp-histogram | tee hg.$BUILD_TAG.log
     ./cds-root/cds-tool/bin/cds-tool run --measure --image $USERNAME -c 1,2,4,8 --input ./cds-root/11mopp/game-of-life/judge.in -o ./cds-root/11mopp/game-of-life/judge.out 11mopp-game-of-life | tee gl.$BUILD_TAG.log
 
     set +e
