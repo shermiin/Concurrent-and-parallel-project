@@ -40,14 +40,23 @@ if [ ! -z "$IMAGE" ]; then
     docker rm ${CONTAINER}
     # and the original image
     #docker rmi ${ORIG_IMAGE}
-    set +e
+
+    cd /data/cdslab/$USERNAME
+    # check results
+    ./cds-root/cds-tool/bin/cds-tool run --image $USERNAME -c 8 --input ./cds-root/11mopp/string-parsing/spec.in -o ./cds-root/11mopp/string-parsing/spec.out
+    ./cds-root/cds-tool/bin/cds-tool run --image $USERNAME -c 8 --input ./cds-root/11mopp/string-parsing/spec_invalid.in -o ./cds-root/11mopp/string-parsing/spec_invalid.out
+    ./cds-root/cds-tool/bin/cds-tool run --image $USERNAME -c 8 --input ./cds-root/11mopp/sudokount/sudokount1.in -o ./cds-root/11mopp/sudokount/sudokount1.out 11mopp-sudokount
+    ./cds-root/cds-tool/bin/cds-tool run --image $USERNAME -c 8 --input ./cds-root/11mopp/sudokount/sudokount2.in -o ./cds-root/11mopp/sudokount/sudokount2.out 11mopp-sudokount
+    ./cds-root/cds-tool/bin/cds-tool run --image $USERNAME -c 8 --input ./cds-root/11mopp/histogram/histogram.in -o ./cds-root/11mopp/histogram/histogram.out 11mopp-histogram 
+    ./cds-root/cds-tool/bin/cds-tool run --image $USERNAME -c 8 --input ./cds-root/11mopp/histogram/judge.in -o ./cds-root/11mopp/histogram/judge.out 11mopp-histogram 
+    ./cds-root/cds-tool/bin/cds-tool run --image $USERNAME -c 8 --input ./cds-root/11mopp/game-of-life/life.in -o ./cds-root/11mopp/game-of-life/life.out 11mopp-game-of-life
 
     # run experiments
-    cd /data/cdslab/$USERNAME
-    ./cds-root/cds-tool/bin/cds-tool run --measure --image $USERNAME -c 1,2,4,8 --input 11mopp/string-parsing/judge.in -o 11mopp/string-parsing/judge.out 11mopp-string-parsing | tee sp.$BUILD_TAG.log
-    ./cds-root/cds-tool/bin/cds-tool run --measure --image $USERNAME -c 1,2,4,8 --input 11mopp/sudokount/judge.in -o 11mopp/sudokount/judge.out 11mopp-sudokount | tee sd.$BUILD_TAG.log
-    ./cds-root/cds-tool/bin/cds-tool run --measure --image $USERNAME -c 1,2,4,8 --input 11mopp/histogram/judge.in -o 11mopp/histogram/judge.out 11mopp-histogram | tee hg.$BUILD_TAG.log
-    ./cds-root/cds-tool/bin/cds-tool run --measure --image $USERNAME -c 1,2,4,8 --input 11mopp/game-of-life/judge.in -o 11mopp/game-of-life/judge.out 11mopp-game-of-life | tee gl.$BUILD_TAG.log
+    ./cds-root/cds-tool/bin/cds-tool run --measure --image $USERNAME -c 1,2,4,8 --input ./cds-root/11mopp/string-parsing/judge.in -o ./cds-root/11mopp/string-parsing/judge.out 11mopp-string-parsing | tee sp.$BUILD_TAG.log
+    ./cds-root/cds-tool/bin/cds-tool run --measure --image $USERNAME -c 1,2,4,8 --input ./cds-root/11mopp/sudokount/judge.in -o ./cds-root/11mopp/sudokount/judge.out 11mopp-sudokount | tee sd.$BUILD_TAG.log
+    wget https://wwwpub.zih.tu-dresden.de/~krahn/world.ppm
+    ./cds-root/cds-tool/bin/cds-tool run --measure --image $USERNAME -c 1,2,4,8 --input ./cds-root/11mopp/histogram/world.ppm 11mopp-histogram | tee hg.$BUILD_TAG.log
+    ./cds-root/cds-tool/bin/cds-tool run --measure --image $USERNAME -c 1,2,4,8 --input ./cds-root/11mopp/game-of-life/judge.in -o ./cds-root/11mopp/game-of-life/judge.out 11mopp-game-of-life | tee gl.$BUILD_TAG.log
 
     set +e
 fi
