@@ -17,7 +17,7 @@
  *
  * usage : $ ./spec
  * [input : symbol string : list]
- * {FAILED, [derivations] SUCCESS}
+ * {FAILED, SUCCESS}
  */
 
 // INCLUDES ////////////////////////////////////////////////////////////////////
@@ -244,7 +244,7 @@ String productions_string (Set <Production> sp) {
 
 String make_output_string (Path p, Bool accept) {
     String s
-        = accept ? path_string (p) + valid_string () : not_valid_string () ;
+        = accept ? valid_string () : not_valid_string () ;
     return s ;
 }
 
