@@ -23,7 +23,6 @@ IMAGE=$(grep 'Successfully built' docker.$BUILD_TAG.log | awk '{ print $3 }')
 
 if [ ! -z "$IMAGE" ]; then
     set -e
-
     # replace cds-tool in student image
 
     # the subsequent `docker commit` replaces the image's CMD
@@ -38,8 +37,7 @@ if [ ! -z "$IMAGE" ]; then
     IMAGE=`docker commit -c "CMD ${CMD}" ${CONTAINER} ${USERNAME}`
     # remove the container
     docker rm ${CONTAINER}
-    # and the original image
-    #docker rmi ${ORIG_IMAGE}
+    set +e
 
     cd /data/cdslab/$USERNAME
     # check results
@@ -57,8 +55,6 @@ if [ ! -z "$IMAGE" ]; then
     wget -q https://wwwpub.zih.tu-dresden.de/~krahn/world.ppm
     ./cds-root/cds-tool/bin/cds-tool run --measure --image $USERNAME -c 1,2,4,8 --input ./world.ppm 11mopp-histogram | tee hg.$BUILD_TAG.log
     ./cds-root/cds-tool/bin/cds-tool run --measure --image $USERNAME -c 1,2,4,8 --input ./cds-root/11mopp/game-of-life/judge.in -o ./cds-root/11mopp/game-of-life/judge.out 11mopp-game-of-life | tee gl.$BUILD_TAG.log
-
-    set +e
 fi
 
 CONTAINER=$( docker ps -a --no-trunc | grep '$USERNAME' | awk '{ print $1 }' | tr '\n' ' ')
