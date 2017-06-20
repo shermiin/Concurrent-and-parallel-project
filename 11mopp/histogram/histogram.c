@@ -5,6 +5,7 @@
 
 #define RGB_COMPONENT_COLOR 255
 
+
 typedef struct {
 	unsigned char red, green, blue;
 } PPMPixel;
@@ -38,17 +39,23 @@ static PPMImage *readPPM() {
 	}
 
 	c = getc(fp);
+
+
 	while (c == '#') {
+
 		while (getc(fp) != '\n')
 			;
 		c = getc(fp);
 	}
 
 	ungetc(c, fp);
+
+
 	if (fscanf(fp, "%d %d", &img->x, &img->y) != 2) {
 		fprintf(stderr, "Invalid image size (error loading)\n");
 		exit(1);
 	}
+
 
 	if (fscanf(fp, "%d", &rgb_comp_color) != 1) {
 		fprintf(stderr, "Invalid rgb component (error loading)\n");
@@ -59,6 +66,8 @@ static PPMImage *readPPM() {
 		fprintf(stderr, "Image does not have 8-bits components\n");
 		exit(1);
 	}
+
+//#pragma omp parallel num_threads(4)
 
 	while (fgetc(fp) != '\n')
 		;
@@ -79,20 +88,21 @@ static PPMImage *readPPM() {
 
 
 void Histogram(PPMImage *image, float *h) {
+ int nn=omp_get_num_procs();
+
 
 	int i, j,  k, l, x, count;
 	int rows, cols;
 
 	float n = image->y * image->x;
-
+int chunk=n/nn;
 	cols = image->x;
 	rows = image->y;
 
 
 
-
-
 	for (i = 0; i < n; i++) {
+               
 		image->data[i].red = floor((image->data[i].red * 4) / 256);
 		image->data[i].blue = floor((image->data[i].blue * 4) / 256);
 		image->data[i].green = floor((image->data[i].green * 4) / 256);
@@ -103,12 +113,12 @@ void Histogram(PPMImage *image, float *h) {
 
 
 
-#pragma omp parallel for
+//#pragma omp parallel num_threads(4) private (j,k,l,i)
 
 
 	count = 0;
 	x = 0;
-   #pragma omp for private (j,k,l,i)
+ //  #pragma omp for 
 	for (j = 0; j <= 3; j++) {
 
                  
@@ -118,9 +128,12 @@ void Histogram(PPMImage *image, float *h) {
 			for (l = 0; l <= 3; l++) {
 
                             
-                                
-				for (i = 0; i < n; i++) {
+                               
+ #pragma  omp parallel for 
+				for (i = 0; i < (int)n; i++) {
 					if (image->data[i].red == j && image->data[i].green == k && image->data[i].blue == l) {
+                                #pragma omp critical
+
 						count++;
 					}
 
@@ -153,7 +166,7 @@ int main(int argc, char *argv[]) {
 	float *h = (float*)malloc(sizeof(float) * 64);
 
 
-#pragma omp parallel for
+
 
 
 	for(i=0; i < 64; i++) h[i] = 0.0;
@@ -161,7 +174,7 @@ int main(int argc, char *argv[]) {
 	Histogram(image, h);
 
 
-#pragma omp parallel for
+
 
 	for (i = 0; i < 64; i++){
 
