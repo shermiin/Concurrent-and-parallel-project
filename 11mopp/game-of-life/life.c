@@ -19,9 +19,6 @@ typedef unsigned char cell_t;
 cell_t ** allocate_board (int size) {
 	cell_t ** board = (cell_t **) malloc(sizeof(cell_t*)*size);
 	int	i;
-
-
-
 	for (i=0; i<size; i++)
 		board[i] = (cell_t *) malloc(sizeof(cell_t)*size);
 	return board;
@@ -45,7 +42,6 @@ int adjacent_to (cell_t ** board, int size, int i, int j) {
         int el = (j+1 < size) ? j+1 : j;
 
 
-  #pragma omp parallel for
 	for (k=sk; k<=ek; k++)
 		for (l=sl; l<=el; l++)
 			count+=board[k][l];
@@ -59,9 +55,10 @@ void play (cell_t ** board, cell_t ** newboard, int size) {
 	/* for each cell, apply the rules of Life */
 
 
- #pragma omp parallel private(i,j)
 	for (i=0; i<size; i++)
+#pragma omp parallel for 
 		for (j=0; j<size; j++) {
+                    #pragma omp critical
 			a = adjacent_to (board, size, i, j);
 			if (a == 2) newboard[i][j] = board[i][j];
 			if (a == 3) newboard[i][j] = 1;
@@ -73,12 +70,6 @@ void play (cell_t ** board, cell_t ** newboard, int size) {
 /* print the life board */
 void print (cell_t ** board, int size) {
 	int	i, j;
-
-#pragma omp parallel for private(j,i)
-
-
-
-
 	/* for each row */
 	for (j=0; j<size; j++) {
 		/* print each column position... */
@@ -87,8 +78,6 @@ void print (cell_t ** board, int size) {
 		/* followed by a carriage return */
 		printf ("\n");
 	}
-
-
 }
 
 /* read a file into the life board */
@@ -113,8 +102,9 @@ void read_file (FILE * f, cell_t ** board, int size) {
 int main () {
 	int size, steps;
 	FILE    *f;
-  f = stdin;
+	f = stdin;
 	fscanf(f,"%d %d", &size, &steps);
+	while (fgetc(f) != '\n') /* no-op */;
 	cell_t ** prev = allocate_board (size);
 	read_file (f, prev,size);
 	fclose(f);
