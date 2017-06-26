@@ -46,7 +46,7 @@ pub fn get_container_id(id_name: &str) -> Result<Option<String>> {
 
         let (id, name) = (line[0], line[1]);
 
-        if id.starts_with(id_name.split_at(12).0) || name.starts_with(id_name) {
+        if id.starts_with(id_name) || name.starts_with(id_name) {
             return Ok(Some(id.to_owned()));
         }
     }
