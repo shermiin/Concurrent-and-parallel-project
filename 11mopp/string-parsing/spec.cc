@@ -31,10 +31,13 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <omp.h>
+#include <stdio.h>
 
 #include "spec.hh"
 
-// IMPLEMENTATIONS /////////////////////////////////////////////////////////////
+// IMPLEMENTATIONS ////////
+/////////////////////////////////////////////////////
 
 template <typename T>
 Set <T> insert (T e, Set <T> s) {
@@ -95,6 +98,7 @@ String back_trim (String s) {
 
 String to_string (SymbolString ss) {
     String x = "" ;
+
     for (String s : ss) {
         x += s + String (" ") ;
     }
@@ -136,9 +140,24 @@ String production_string (Production prod) {
 
 String path_string (Path deriv) {
     String s ;
+ 
+
     for (Production p : deriv) {
+
+ #pragma omp task shared (s)
+{
+
         s += production_string (p) ;
+
+ }
+#pragma omp task shared (s)
+{
+
         s += linebreak () ;
+
+}
+
+
     }
     return s ;
 }
@@ -213,11 +232,24 @@ Set <Symbol> read_terminals (Stream& fin) {
 template <typename Stream>
 Grammar read_grammar (Stream& fin) {
     Grammar g ;
+ #pragma omp task shared(fin)
+
     g.terminals    = read_terminals (fin)    ;
+
+ 
+
     g.nonterminals = read_nonterminals (fin) ;
+
+ 
+
     g.start        = read_start (fin)        ;
+
+ 
+
     g.productions  = read_productions (fin)  ;
+
     return g ;
+
 }
 
 template <typename Stream>
@@ -235,7 +267,10 @@ Input read_input (Stream& fin) {
 
 String productions_string (Set <Production> sp) {
     String s ;
+ 
     for (Production p : sp) {
+//#pragma omp task shared (s)
+
         s += production_string (p) ;
         s += linebreak () ;
     }
@@ -267,12 +302,18 @@ Bool exists_non_terminal (Grammar g, SymbolString ss) {
 }
 
 Bool begins_with_terminal (Grammar g, SymbolString ss) {
+
+
     if (! ss.empty ()) {
         if (is_terminal (g, * std::begin (ss))) {
             return true ;
+
         }
+
     }
     return false ;
+
+
 }
 
 Symbol first_leftmost_nonterminal (Set <Symbol> n, SymbolString ss) {
@@ -302,8 +343,11 @@ Bool any_empty (Stack s) {
 
 SymbolString common_prefix (SymbolString a, SymbolString b) {
     // pre : assert (! empty (a) && ! empty (b)) ;
-    auto miss
+   
+ auto miss
+
         = std::mismatch
+
             ( std::begin (a)
             , std::end   (a)
             , std::begin (b) ) ;
@@ -349,6 +393,7 @@ Stack reduce (Stack s) {
     if (any_empty (s)) return s ;
     Pair <SymbolString, SymbolString> p
         = eliminate_common_prefix (s.current, s.input) ;
+//#pragma omp task
     s.current = p.first ;
     s.input = p.second ;
     return s ;
@@ -403,7 +448,9 @@ Eval parse_recursive_descent (Grammar g, Stack s) {
     if (begins_with_terminal (g, s.current)) {
         return Eval (Path (), false) ;
     }
+
     if (s.input.empty ()) {
+
         if (s.current.empty ()) {
             return Eval (derivations (s), true) ;
         }
