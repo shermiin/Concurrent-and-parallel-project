@@ -204,9 +204,17 @@ Set <Production> read_productions (Stream& fin) {
     Set <Production> prod ;
     String s ;
     String end_mark = end_of_productions_string () ;
+
+ #pragma omp parallel 
+
+#pragma omp single
     while (true) {
+
+#pragma omp task
         s = get_line (fin) ;
+
         if (s == end_mark) break ;
+
         prod = insert (read_production (s), prod) ;
     }
     return prod ;
@@ -230,26 +238,15 @@ Set <Symbol> read_terminals (Stream& fin) {
 }
 
 template <typename Stream>
+
 Grammar read_grammar (Stream& fin) {
+
     Grammar g ;
- #pragma omp task shared(fin)
-
     g.terminals    = read_terminals (fin)    ;
-
- 
-
     g.nonterminals = read_nonterminals (fin) ;
-
- 
-
     g.start        = read_start (fin)        ;
-
- 
-
     g.productions  = read_productions (fin)  ;
-
     return g ;
-
 }
 
 template <typename Stream>
@@ -267,10 +264,10 @@ Input read_input (Stream& fin) {
 
 String productions_string (Set <Production> sp) {
     String s ;
- 
-    for (Production p : sp) {
-//#pragma omp task shared (s)
 
+    for (Production p : sp) {
+
+//#pragma omp task
         s += production_string (p) ;
         s += linebreak () ;
     }
@@ -304,6 +301,7 @@ Bool exists_non_terminal (Grammar g, SymbolString ss) {
 Bool begins_with_terminal (Grammar g, SymbolString ss) {
 
 
+
     if (! ss.empty ()) {
         if (is_terminal (g, * std::begin (ss))) {
             return true ;
@@ -317,7 +315,9 @@ Bool begins_with_terminal (Grammar g, SymbolString ss) {
 }
 
 Symbol first_leftmost_nonterminal (Set <Symbol> n, SymbolString ss) {
+
     for (Symbol s : ss) {
+
         if (belongs_to (Symbol (s), n)) return s ;
     }
     return Symbol () ;
@@ -331,6 +331,7 @@ Set <Production> all_productions_from_nonterminal
     ( Set <Production> lp
     , Symbol nt ) {
     Set <Production> x ;
+
     for (Production p : lp) {
         if (left_side_equals (p, SymbolString {nt})) x = insert (p, x) ;
     }
@@ -407,13 +408,16 @@ Stack expand (Stack s, Production p) {
 
 Set <Stack> expand_all (Stack s, Set <Production> lp) {
     Set <Stack> stacks ;
+
     for (Production p : lp) {
+
         stacks = insert (expand (s, p), stacks) ;
     }
     return stacks ;
 }
 
 Set <Stack> all_leftmost_derivations_nonempty (Grammar g, Stack s) {
+
     Set <Production> lp
         = all_productions_from_nonterminal
             ( productions (g)
@@ -428,7 +432,9 @@ Set <Stack> all_leftmost_derivations (Grammar g, Stack s) {
 
 Eval accept_any_of (Grammar g, Set <Stack> ls) {
     // pre : assert (reduced (s)) ;
+
     for (Stack s : ls) {
+
         Eval e = parse_recursive_descent (g, s) ;
         if (accept (e)) {
             return e ;
@@ -445,6 +451,9 @@ Eval accept_any_of_all_leftmost_derivations (Grammar g, Stack s) {
 
 Eval parse_recursive_descent (Grammar g, Stack s) {
     s = reduce (s) ;
+
+
+
     if (begins_with_terminal (g, s.current)) {
         return Eval (Path (), false) ;
     }
@@ -454,9 +463,11 @@ Eval parse_recursive_descent (Grammar g, Stack s) {
         if (s.current.empty ()) {
             return Eval (derivations (s), true) ;
         }
+
         if (! exists_non_terminal (g, s.current)) {
             return Eval (Path (), false) ;
         }
+
     }
     return accept_any_of_all_leftmost_derivations (g, s) ;
 }
