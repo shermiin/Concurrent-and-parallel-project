@@ -66,4 +66,5 @@ fi
 IMAGE=$(docker images | grep '$USERNAME' | awk '{ print $3 }' | tr '\n' ' ')
 if [ ! -z "$IMAGE" ]; then
 	 docker rmi $IMAGE
+     docker rmi $ORIG_IMAGE || true
 fi
