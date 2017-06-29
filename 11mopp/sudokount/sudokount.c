@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <limits.h>
-
+#include <omp.h>
 #define INT_TYPE unsigned long long 
 #define INT_TYPE_SIZE (sizeof(INT_TYPE) * 8)
 #define CELL_VAL_SIZE 1
@@ -68,15 +68,25 @@ static inline int digit_get (cell_v *v) {
 }
 
 static void destroy_sudoku(sudoku *s) {
+
+
+
+
     for (int i = 0; i < s->dim; i++) {
+#pragma omp parallel for
         for (int j = 0; j < s->dim; j++) {
+
+
             for (int k = 0; k < 3; k++)
+#pragma omp critical
                 free(s->unit_list[i][j][k]);
             free(s->unit_list[i][j]);
         }
         free(s->unit_list[i]);
     }
     free(s->unit_list);
+
+
     
     for (int i = 0; i < s->dim; i++) {
         for (int j = 0; j < s->dim; j++)
@@ -96,6 +106,7 @@ static void init(sudoku *s) {
     int i, j, k, l, pos;
     
     //unit list 
+  #pragma omp parallel for private(pos)
     for (i = 0; i < s->dim; i++) {
         int ibase = i / s->bdim * s->bdim;
         for (j = 0; j < s->dim; j++) {
