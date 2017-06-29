@@ -87,7 +87,8 @@ void Histogram(PPMImage *image, float *h) {
 
 	cols = image->x;
 	rows = image->y;
- 
+
+  #pragma omp parallel  for
 
 	for (i = 0; i < (int)n; i++) {
 		image->data[i].red = floor((image->data[i].red * 4) / 256);
@@ -106,7 +107,9 @@ void Histogram(PPMImage *image, float *h) {
 				for (i = 0; i <(int) n; i++) {
 					if (image->data[i].red == j && image->data[i].green == k && image->data[i].blue == l) {
                             #pragma omp atomic
+                                        
 						count++;
+                                        
 					}
 				}
 				h[x] = count / n;
