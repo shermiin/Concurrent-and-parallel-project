@@ -59,7 +59,10 @@ void play (cell_t ** board, cell_t ** newboard, int size) {
 
 
 	for (i=0; i<size; i++)
- #pragma omp parallel private(a)
+
+ #pragma omp parallel for private(a)
+
+
 		for (j=0; j<size; j++) {
                     
 			a = adjacent_to (board, size, i, j);
@@ -68,6 +71,8 @@ void play (cell_t ** board, cell_t ** newboard, int size) {
 			if (a < 2) newboard[i][j] = 0;
 			if (a > 3) newboard[i][j] = 0;
 		}
+
+
 }
 
 
