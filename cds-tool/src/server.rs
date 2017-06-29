@@ -11,7 +11,6 @@ use self::rustc_serialize::json::Json;
 
 use serde_json;
 
-use std;
 use std::thread;
 use std::fs::File;
 use std::path::Path;
@@ -21,8 +20,6 @@ use std::process::{Command, Stdio};
 
 use std::io::{Write, Read};
 use std::ops::DerefMut;
-use std::ops::Add;
-use std::os::unix::io::IntoRawFd;
 
 use errors::*;
 
@@ -53,7 +50,6 @@ fn extract_config(json: Json) -> Result<Vec<(String, String)>> {
                     match arr[i].as_array() {
                         Some(entry) => {
                             ensure!(entry.len() == 2, "Entry {} of server config file doesn't contain two values!", i+1);
-                    //#TODO: refactor
                             ensure!(entry[0].is_string(), "First value of entry {} of server config file isn't a string!", i+1);
                             ensure!(entry[1].is_string(), "Second value of entry {} of server config file isn't a string!", i+1);
                             config.push((entry[0].as_string().unwrap_or("UNEXPECTED ERROR").to_owned(), entry[1].as_string().unwrap_or("UNEXPECTED_ERROR").to_owned()))
@@ -152,8 +148,7 @@ impl iron::Handler for InvokeHandler {
         debug!("Decoding base64 encoded stdin message ...");
         let stdin_decoded = itry!(base64::decode(req_body.stdin.as_str()), self.json_error("Unable to decode base64 stdin content".to_owned()));
 
-        debug!("Starting timer and sending stdin ...");
-        let start = Instant::now();
+        debug!("Sending input to stdin ...");
         match child.stdin.take() {
             Some(mut stdin) => {
                 itry!(
@@ -170,6 +165,8 @@ impl iron::Handler for InvokeHandler {
                 return Err(IronError::new(Error::from_kind(ErrorKind::Msg(msg.clone())), self.json_error(msg)));
             }
         };
+        debug!("Starting timer ...");
+        let start = Instant::now();
 
         let mut stdout = match child.stdout.take() {
             Some(stdout) => stdout,

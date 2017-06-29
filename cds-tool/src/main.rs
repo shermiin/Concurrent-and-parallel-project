@@ -82,7 +82,7 @@ fn run() -> Result<()> {
             .arg_from_usage("-o --output=[output] 'File containing the expected output/solution'")
             .arg_from_usage("-w --write=[write] 'Write output to this file'")
             .arg_from_usage("-m --measure 'Measure-mode, run multiple times and output csv-like data (duration in micro seconds)'")
-            .arg_from_usage("-c --cpus=[cpus] 'Number of cpus the application is allowed to use (can be a comma-separated list in measure-mode) [default: 1,2,3,4]'")
+            .arg_from_usage("-c --cpus=[cpus] 'Number of cpus the application is allowed to use (can be a comma-separated list in measure-mode) [default: 1,2,4,8]'")
             .arg_from_usage("-r --runs=[runs] 'Number of runs to average the program runtime (only in measure-mode) [default: 3]'")
             .arg_from_usage("<program> 'The program to start'")
             .group(clap::ArgGroup::with_name("unit-under-test")
