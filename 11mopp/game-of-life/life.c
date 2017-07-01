@@ -61,12 +61,13 @@ void play (cell_t ** board, cell_t ** newboard, int size) {
 
 	int	i, j, a;
 	/* for each cell, apply the rules of Life */
-#pragma omp parallel  private(a,j,i) 
-{
+
 
 
 for (i=0; i<size; i++)
-#pragma omp for
+#pragma omp parallel  private(a,j) 
+{
+#pragma omp for 
 		for (j=0; j<size; j++) {
                
 			a = adjacent_to (board, size, i, j);
@@ -102,6 +103,8 @@ void read_file (FILE * f, cell_t ** board, int size) {
 		/* get a string */
 		fgets (s, size+10,f);
 		/* copy the string to the life board */
+
+#pragma omp parallel for
 		for (i=0; i<size; i++)
 		{
 		 	//c=fgetc(f);
