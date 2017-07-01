@@ -73,10 +73,10 @@ static void destroy_sudoku(sudoku *s) {
 
 
     for (int i = 0; i < s->dim; i++) {
-#pragma omp parallel for
+
         for (int j = 0; j < s->dim; j++) {
 
-
+#pragma omp parallel for
             for (int k = 0; k < 3; k++)
 #pragma omp critical
                 free(s->unit_list[i][j][k]);
@@ -87,7 +87,7 @@ static void destroy_sudoku(sudoku *s) {
     free(s->unit_list);
 
 
-    
+  
     for (int i = 0; i < s->dim; i++) {
         for (int j = 0; j < s->dim; j++)
             free(s->peers[i][j]);
@@ -106,7 +106,7 @@ static void init(sudoku *s) {
     int i, j, k, l, pos;
     
     //unit list 
-  #pragma omp parallel for private(pos)
+ // #pragma omp parallel for private(pos,j)
     for (i = 0; i < s->dim; i++) {
         int ibase = i / s->bdim * s->bdim;
         for (j = 0; j < s->dim; j++) {
@@ -126,6 +126,7 @@ static void init(sudoku *s) {
     }
     
     //peers
+  
     for (i = 0; i < s->dim; i++)
         for (j = 0; j < s->dim; j++) {
             pos = 0;
@@ -148,7 +149,9 @@ static void init(sudoku *s) {
 static int parse_grid(sudoku *s) {
     int i, j, k;
     int ld_vals[s->dim][s->dim];
+  
     for (k = 0, i = 0; i < s->dim; i++)
+
         for (j = 0; j < s->dim; j++, k++) {
             ld_vals[i][j] = s->grid[k];
         }
@@ -180,12 +183,14 @@ static sudoku *create_sudoku(int bdim, int *grid) {
     //[r][c][0 - row, 1 - column, 2 - box]//[r][c][0 - row, 1 - column, 2 - box][ix]
     r->unit_list = malloc(sizeof(cell_coord***) * dim);
     assert(r->unit_list);
+
     for (int i = 0; i < dim; i++) {
         r->unit_list[i] = malloc(sizeof(cell_coord**) * dim);
         assert (r->unit_list[i]);
         for (int j = 0; j < dim; j++) {
             r->unit_list[i][j] = malloc(sizeof(cell_coord*) * 3);
             assert(r->unit_list[i][j]);
+#pragma omp parallel for 
             for (int k = 0; k < 3; k++) {
                 r->unit_list[i][j][k] = calloc(dim, sizeof(cell_coord));
                 assert(r->unit_list[i][j][k]);
@@ -195,6 +200,7 @@ static sudoku *create_sudoku(int bdim, int *grid) {
     
     r->peers = malloc(sizeof(cell_coord**) * dim);
     assert(r->peers);
+ 
     for (int i = 0; i < dim; i++) {
         r->peers[i] = malloc(sizeof(cell_coord*) * dim);
         assert(r->peers[i]);
@@ -233,6 +239,7 @@ static int eliminate (sudoku *s, int i, int j, int d) {
     if (count == 0) {
         return 0;
     } else if (count == 1) {
+
         for (k = 0; k < s->peers_size; k++)
             if (!eliminate(s, s->peers[i][j][k].r, s->peers[i][j][k].c, digit_get(&s->values[i][j])))
                 return 0;
@@ -299,7 +306,7 @@ static int search (sudoku *s, int status) {
     cell_v **values_bkp = malloc (sizeof (cell_v *) * s->dim);
     for (i = 0; i < s->dim; i++)
         values_bkp[i] = malloc (sizeof (cell_v) * s->dim);
-    
+   // #pragma omp parallel for private(min,i,j)
     for (i = 0; i < s->dim; i++) 
         for (j = 0; j < s->dim; j++) {
             int used = cell_v_count(&s->values[i][j]);
