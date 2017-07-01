@@ -106,10 +106,11 @@ static void init(sudoku *s) {
     int i, j, k, l, pos;
     
     //unit list 
- // #pragma omp parallel for private(pos,j)
+  //#pragma omp parallel 
     for (i = 0; i < s->dim; i++) {
         int ibase = i / s->bdim * s->bdim;
         for (j = 0; j < s->dim; j++) {
+#pragma omp parallel for private(pos)
             for (pos = 0; pos < s->dim; pos++) {
                 s->unit_list[i][j][0][pos].r = i; //row 
                 s->unit_list[i][j][0][pos].c = pos;
@@ -130,6 +131,7 @@ static void init(sudoku *s) {
     for (i = 0; i < s->dim; i++)
         for (j = 0; j < s->dim; j++) {
             pos = 0;
+
             for (k = 0; k < s->dim; k++) { //row
                 if (s->unit_list[i][j][0][k].c != j)
                     s->peers[i][j][pos++] = s->unit_list[i][j][0][k]; 
@@ -155,7 +157,6 @@ static int parse_grid(sudoku *s) {
         for (j = 0; j < s->dim; j++, k++) {
             ld_vals[i][j] = s->grid[k];
         }
-    
     for (i = 0; i < s->dim; i++)
         for (j = 0; j < s->dim; j++)
             for (k = 1; k <= s->dim; k++)
@@ -190,7 +191,7 @@ static sudoku *create_sudoku(int bdim, int *grid) {
         for (int j = 0; j < dim; j++) {
             r->unit_list[i][j] = malloc(sizeof(cell_coord*) * 3);
             assert(r->unit_list[i][j]);
-#pragma omp parallel for 
+
             for (int k = 0; k < 3; k++) {
                 r->unit_list[i][j][k] = calloc(dim, sizeof(cell_coord));
                 assert(r->unit_list[i][j][k]);
