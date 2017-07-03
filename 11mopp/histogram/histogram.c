@@ -103,15 +103,19 @@ void Histogram(PPMImage *image, float *h) {
 		for (k = 0; k <= 3; k++) {
 			for (l = 0; l <= 3; l++) {
 
-                  #pragma omp parallel  for
+                
+                               #pragma omp parallel for ordered //reduction(+:count)
+                             
 				for (i = 0; i <(int) n; i++) {
 					if (image->data[i].red == j && image->data[i].green == k && image->data[i].blue == l) {
-                            #pragma omp atomic
-                                        
-						count++;
-                                        
+                                          #pragma omp ordered
+                                                  count++;
+                                                                               
 					}
 				}
+                                
+
+
 				h[x] = count / n;
 				count = 0;
 				x++;
