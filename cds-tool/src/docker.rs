@@ -1,6 +1,6 @@
-use std::process::{Command};
-use std::str;
 use std::net::SocketAddr;
+use std::process::Command;
+use std::str;
 
 use std::str::FromStr;
 
@@ -12,15 +12,20 @@ fn run(c: &mut Command) -> Result<String> {
 
     if !output.status.success() {
         if let Ok(stderr) = String::from_utf8(output.stderr) {
-            bail!("invocation of docker client terminated unsuccessfully with exit code {}: {}",
-                output.status.code().unwrap_or(-1), stderr);
+            bail!(
+                "invocation of docker client terminated unsuccessfully with exit code {}: {}",
+                output.status.code().unwrap_or(-1),
+                stderr
+            );
         } else {
             bail!("invocation of docker client terminated unsuccessfully with exit code {}\n: stderr of docker client is not decodable (contains non-utf8 signs)",
                 output.status.code().unwrap_or(-1));
         }
     }
 
-    Ok(try!(str::from_utf8(output.stdout.as_slice()).chain_err(|| "unable to parse docker result: invalid UTF-8 encoding")).to_owned())
+    Ok(try!(str::from_utf8(output.stdout.as_slice())
+        .chain_err(|| "unable to parse docker result: invalid UTF-8 encoding"))
+    .to_owned())
 }
 
 pub fn check() -> Result<()> {
@@ -41,7 +46,7 @@ pub fn get_container_id(id_name: &str) -> Result<Option<String>> {
     for entry in output.split("\n") {
         let line: Vec<&str> = entry.split(":").collect();
         if line.len() != 2 {
-            continue
+            continue;
         };
 
         let (id, name) = (line[0], line[1]);
@@ -63,7 +68,7 @@ pub fn get_image_id(id_name: &str) -> Result<Option<String>> {
     for entry in output.split("\n") {
         let line: Vec<&str> = entry.split(" ").collect();
         if line.len() != 2 {
-            continue
+            continue;
         };
 
         let (id, name) = (line[0], line[1]);
@@ -77,14 +82,12 @@ pub fn get_image_id(id_name: &str) -> Result<Option<String>> {
 }
 
 pub fn get_public_addr(container_id: &str, port: u16) -> Result<Option<SocketAddr>> {
-    let output = try!(run(Command::new("docker")
-        .arg("port")
-        .arg(container_id)));
+    let output = try!(run(Command::new("docker").arg("port").arg(container_id)));
 
     for entry in output.split("\n") {
         let line: Vec<&str> = entry.split(" -> ").collect();
         if line.len() != 2 {
-            continue
+            continue;
         };
 
         let (inner, outer) = (line[0], line[1]);
@@ -101,8 +104,7 @@ pub fn get_public_addr(container_id: &str, port: u16) -> Result<Option<SocketAdd
 
 pub fn start_container(image_id: &str, options: &[&str]) -> Result<String> {
     let mut cmd = Command::new("docker");
-    cmd.arg("run")
-       .arg("-d");
+    cmd.arg("run").arg("-d");
 
     for option in options.iter() {
         cmd.arg(option);
@@ -115,8 +117,7 @@ pub fn stop_container(container_id: &str, remove: bool) -> Result<()> {
     let mut cmd = Command::new("docker");
 
     if remove {
-        cmd.arg("rm")
-           .arg("--force");
+        cmd.arg("rm").arg("--force");
     } else {
         cmd.arg("stop");
     }
